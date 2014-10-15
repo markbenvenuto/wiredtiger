@@ -25,29 +25,29 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#define __STDC__ 0
+
 #include <sys/stat.h>
-#include <sys/time.h>
 #include <sys/types.h>
 
 #include <assert.h>
 #include <ctype.h>
+#include <direct.h>
 #include <errno.h>
-#include <fcntl.h>
 #include <inttypes.h>
 #include <limits.h>
-#include <pthread.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 
 #ifdef BDB
 #include <db.h>
 #endif
-#include <wiredtiger.h>
 
-#include <wiredtiger_ext.h>
+#include <wt_internal.h>
+#include "windows_shim.h"
+
 extern WT_EXTENSION_API *wt_api;
 
 #define	EXTPATH	"../../ext/"			/* Extensions path */
@@ -113,8 +113,8 @@ typedef struct {
 	uint32_t run_cnt;			/* Run counter */
 
 	enum {
-	    LOG_FILE=1,				/* Use a log file */
-	    LOG_OPS=2				/* Log all operations */
+		LOG_FILE=1,				/* Use a log file */
+		LOG_OPS=2				/* Log all operations */
 	} logging;
 	FILE *logfp;				/* Log file */
 
@@ -122,7 +122,7 @@ typedef struct {
 	int track;				/* Track progress */
 	int threads_finished;			/* Operations completed */
 
-	pthread_rwlock_t backup_lock;		/* Hot backup running */
+	WT_RWLOCK* backup_lock;			/* Hot backup running */
 
 	/*
 	 * We have a list of records that are appended, but not yet "resolved",
@@ -132,7 +132,7 @@ typedef struct {
 	uint64_t *append;			/* Appended records */
 	size_t    append_max;			/* Maximum unresolved records */
 	size_t	  append_cnt;			/* Current unresolved records */
-	pthread_rwlock_t append_lock;		/* Single-thread resolution */
+	WT_RWLOCK* append_lock;			/* Single-thread resolution */
 
 	char *uri;				/* Object name */
 

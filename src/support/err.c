@@ -293,6 +293,8 @@ __wt_err(WT_SESSION_IMPL *session, int error, const char *fmt, ...)
 {
 	va_list ap;
 
+	//DebugBreak();
+
 	/*
 	 * Ignore error returns from underlying event handlers, we already have
 	 * an error value to return.
@@ -311,6 +313,8 @@ __wt_errx(WT_SESSION_IMPL *session, const char *fmt, ...)
     WT_GCC_FUNC_ATTRIBUTE((format (printf, 2, 3)))
 {
 	va_list ap;
+
+    //DebugBreak();
 
 	/*
 	 * Ignore error returns from underlying event handlers, we already have
@@ -443,8 +447,9 @@ __wt_assert(WT_SESSION_IMPL *session,
 	(void)__wt_eventv(session, 0, error, file_name, line_number, fmt, ap);
 	va_end(ap);
 
+	//DebugBreak();
 #ifdef HAVE_DIAGNOSTIC
-	__wt_abort(session);			/* Drop core if testing. */
+	//__wt_abort(session);			/* Drop core if testing. */
 	/* NOTREACHED */
 #endif
 }
@@ -456,6 +461,8 @@ __wt_assert(WT_SESSION_IMPL *session,
 int
 __wt_panic(WT_SESSION_IMPL *session)
 {
+	//DebugBreak();
+
 	F_SET(S2C(session), WT_CONN_PANIC);
 	__wt_errx(session, "%s",
 	    "the WiredTiger library cannot continue; the process must exit "
@@ -481,6 +488,7 @@ __wt_panic(WT_SESSION_IMPL *session)
 int
 __wt_illegal_value(WT_SESSION_IMPL *session, const char *name)
 {
+	//DebugBreak();
 	__wt_errx(session, "%s%s%s",
 	    name == NULL ? "" : name, name == NULL ? "" : ": ",
 	    "encountered an illegal file format or internal value");

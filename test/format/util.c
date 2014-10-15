@@ -276,16 +276,19 @@ path_setup(const char *home)
 	 * log file.
 	 */
 #undef	CMD
-#define	CMD	"cd %s && rm -rf `ls | sed /rand/d`"
-	len = strlen(g.home) + strlen(CMD) + 1;
+//#define	CMD	"cd %s && rm -rf `ls | sed /rand/d`"
+#define	CMD	"cd %s && del /s /q * && rd /s /q KVS"
+
+    len = strlen(g.home) + strlen(CMD) + 1;
 	if ((g.home_init = malloc(len)) == NULL)
 		die(errno, "malloc");
 	snprintf(g.home_init, len, CMD, g.home);
 
 	/* Backup directory initialize command, remove and re-create it. */
 #undef	CMD
-#define	CMD	"rm -rf %s && mkdir %s"
-	len = strlen(g.home_backup) * 2 + strlen(CMD) + 1;
+//#define	CMD	"rm -rf %s && mkdir %s"
+#define	CMD	"del /s && mkdir %s"
+    len = strlen(g.home_backup) * 2 + strlen(CMD) + 1;
 	if ((g.home_backup_init = malloc(len)) == NULL)
 		die(errno, "malloc");
 	snprintf(g.home_backup_init, len, CMD, g.home_backup, g.home_backup);

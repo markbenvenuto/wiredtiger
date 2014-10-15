@@ -27,6 +27,23 @@
 
 #include "wtperf.h"
 
+#ifdef _WIN32
+typedef uint32_t useconds_t;
+
+#define sleep Sleep
+
+int
+usleep(useconds_t useconds)
+{
+    uint32_t milli;
+    milli = useconds / 1000;
+    if (milli == 0)
+	    milli++;
+    Sleep(milli);
+    return (0);
+}
+#endif
+
 /* Default values. */
 static const CONFIG default_cfg = {
 	"WT_TEST",			/* home */
@@ -63,17 +80,6 @@ static const CONFIG default_cfg = {
 
 static const char * const debug_cconfig = "";
 static const char * const debug_tconfig = "";
-
-/*
- * Atomic update where needed.
- */
-#if defined(_lint)
-#define	ATOMIC_ADD(v, val)	((v) += (val), (v))
-#define	ATOMIC_ADD_PTR(p, val)	((*p) += (val), (*p))
-#else
-#define	ATOMIC_ADD(v, val)	__sync_add_and_fetch(&(v), val)
-#define	ATOMIC_ADD_PTR(p, val)	__sync_add_and_fetch((p), val)
-#endif
 
 static void	*checkpoint_worker(void *);
 static int	 create_tables(CONFIG *);
@@ -112,15 +118,15 @@ extern void	__wt_random_init(uint32_t *);
 static inline uint64_t
 get_next_incr(CONFIG *cfg)
 {
-	return (ATOMIC_ADD(cfg->insert_key, 1));
+	return (WT_ATOMIC_ADD8(cfg->insert_key, 1));
 }
 
 /* Count number of async inserts completed. */
-static inline uint64_t
+/*static inline uint64_t
 async_next_incr(uint64_t *val)
 {
 	return (ATOMIC_ADD_PTR(val, 1));
-}
+}*/
 
 static inline void
 generate_key(CONFIG *cfg, char *key_buf, uint64_t keyno)
@@ -179,7 +185,7 @@ cb_asyncop(WT_ASYNC_CALLBACK *cb, WT_ASYNC_OP *op, int ret, uint32_t flags)
 	switch (type) {
 	case WT_AOP_COMPACT:
 		tables = (uint32_t *)op->app_private;
-		ATOMIC_ADD(*tables, (uint32_t)-1);
+		WT_ATOMIC_ADD4(*tables, (uint32_t)-1);
 		break;
 	case WT_AOP_INSERT:
 		trk = &thread->insert;
@@ -214,7 +220,7 @@ cb_asyncop(WT_ASYNC_CALLBACK *cb, WT_ASYNC_OP *op, int ret, uint32_t flags)
 		return (0);
 	if (ret == 0 || (ret == WT_NOTFOUND && type != WT_AOP_INSERT)) {
 		if (!cfg->in_warmup)
-			(void)async_next_incr(&trk->ops);
+			(void)WT_ATOMIC_ADD8(trk->ops, 1);
 		return (0);
 	}
 err:
@@ -1714,8 +1720,8 @@ start_all_runs(CONFIG *cfg)
 			fprintf(stderr, "%s: failed\n", cmd_buf);
 			goto err;
 		}
-		if ((ret = pthread_create(
-		    &threads[i], NULL, thread_run_wtperf, next_cfg)) != 0) {
+		if ((ret = __wt_thread_create(NULL,
+		    &threads[i], thread_run_wtperf, next_cfg)) != 0) {
 			lprintf(cfg, ret, 0, "Error creating thread");
 			goto err;
 		}
@@ -1723,7 +1729,7 @@ start_all_runs(CONFIG *cfg)
 
 	/* Wait for threads to finish. */
 	for (i = 0; i < cfg->database_count; i++) {
-		if ((t_ret = pthread_join(threads[i], NULL)) != 0) {
+		if ((t_ret = __wt_thread_join(NULL, threads[i])) != 0) {
 			lprintf(cfg, ret, 0, "Error joining thread");
 			if (ret == 0)
 				ret = t_ret;
@@ -1796,8 +1802,8 @@ start_run(CONFIG *cfg)
 
 	/* Start the monitor thread. */
 	if (cfg->sample_interval != 0) {
-		if ((ret = pthread_create(
-		    &monitor_thread, NULL, monitor, cfg)) != 0) {
+		if ((ret = __wt_thread_create(NULL,
+		    &monitor_thread, monitor, cfg)) != 0) {
 			lprintf(
 			    cfg, ret, 0, "Error creating monitor thread.");
 			goto err;
@@ -1883,7 +1889,7 @@ err:		if (ret == 0)
 			ret = t_ret;
 
 	if (monitor_created != 0 &&
-	    (t_ret = pthread_join(monitor_thread, NULL)) != 0) {
+	    (t_ret = __wt_thread_join(NULL, monitor_thread)) != 0) {
 		lprintf(cfg, ret, 0, "Error joining monitor thread.");
 		if (ret == 0)
 			ret = t_ret;
@@ -2047,7 +2053,7 @@ main(int argc, char *argv[])
 	    cfg->table_name);
 
 	/* Make stdout line buffered, so verbose output appears quickly. */
-	(void)setvbuf(stdout, NULL, _IOLBF, 0);
+	(void)setvbuf(stdout, NULL, _IOLBF, 32);
 
 	/* Concatenate non-default configuration strings. */
 	if (cfg->verbose > 1 || user_cconfig != NULL ||
@@ -2184,8 +2190,8 @@ start_threads(CONFIG *cfg,
 
 	/* Start the threads. */
 	for (i = 0, thread = base; i < num; ++i, ++thread)
-		if ((ret = pthread_create(
-		    &thread->handle, NULL, func, thread)) != 0) {
+		if ((ret = __wt_thread_create(NULL,
+		    &thread->handle, func, thread)) != 0) {
 			lprintf(cfg, ret, 0, "Error creating thread");
 			return (ret);
 		}
@@ -2203,7 +2209,7 @@ stop_threads(CONFIG *cfg, u_int num, CONFIG_THREAD *threads)
 		return (0);
 
 	for (i = 0; i < num; ++i, ++threads) {
-		if ((ret = pthread_join(threads->handle, NULL)) != 0) {
+		if ((ret = __wt_thread_join(NULL, threads->handle)) != 0) {
 			lprintf(cfg, ret, 0, "Error joining thread");
 			return (ret);
 		}

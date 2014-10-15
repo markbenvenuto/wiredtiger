@@ -31,6 +31,7 @@ extern "C" {
 #include <errno.h>
 #include <fcntl.h>
 #include <inttypes.h>
+#include <io.h>
 #include <limits.h>
 #ifndef _WIN32
 #include <pthread.h>
