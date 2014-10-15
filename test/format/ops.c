@@ -95,15 +95,15 @@ wts_ops(void)
 		for (i = 0; i < g.c_threads; ++i) {
 			tinfo[i].id = (int)i + 1;
 			tinfo[i].state = TINFO_RUNNING;
-			if ((ret = pthread_create(
-			    &tinfo[i].tid, NULL, ops, &tinfo[i])) != 0)
-				die(ret, "pthread_create");
+			if ((ret = __wt_thread_create(
+					NULL, &tinfo[i].tid, ops, &tinfo[i])) != 0)
+				die(ret, "__wt_thread_create");
 		}
 		if ((ret =
-		    pthread_create(&backup_tid, NULL, backup, NULL)) != 0)
+			__wt_thread_create(NULL, &backup_tid, backup, NULL)) != 0)
 			die(ret, "pthread_create");
 		if (g.c_compact && (ret =
-		    pthread_create(&compact_tid, NULL, compact, NULL)) != 0)
+			__wt_thread_create(NULL, &compact_tid, compact, NULL)) != 0)
 			die(ret, "pthread_create");
 
 		/* Wait for the threads. */
@@ -125,7 +125,7 @@ wts_ops(void)
 					break;
 				case TINFO_COMPLETE:
 					tinfo[i].state = TINFO_JOINED;
-					(void)pthread_join(tinfo[i].tid, NULL);
+					(void)__wt_thread_join(NULL, tinfo[i].tid);
 					break;
 				case TINFO_JOINED:
 					break;
@@ -140,9 +140,9 @@ wts_ops(void)
 
 		/* Wait for the backup, compaction thread. */
 		g.threads_finished = 1;
-		(void)pthread_join(backup_tid, NULL);
+		(void)__wt_thread_join(NULL, backup_tid);
 		if (g.c_compact)
-			(void)pthread_join(compact_tid, NULL);
+			(void)__wt_thread_join(NULL, compact_tid);
 	}
 
 	if (g.logging != 0) {
@@ -316,7 +316,7 @@ ops(void *arg)
 
 			/* Named checkpoints lock out backups */
 			if (ckpt_config != NULL &&
-			    (ret = pthread_rwlock_wrlock(&g.backup_lock)) != 0)
+			    (ret = __wt_writelock(NULL, g.backup_lock)) != 0)
 				die(ret,
 				    "pthread_rwlock_wrlock: backup lock");
 
@@ -327,7 +327,7 @@ ops(void *arg)
 				    ckpt_config == NULL ? "" : ckpt_config);
 
 			if (ckpt_config != NULL &&
-			    (ret = pthread_rwlock_unlock(&g.backup_lock)) != 0)
+			    (ret = __wt_rwunlock(NULL, g.backup_lock)) != 0)
 				die(ret,
 				    "pthread_rwlock_wrlock: backup lock");
 
@@ -879,7 +879,7 @@ table_append(uint64_t keyno)
 	 * and we find a slot.
 	 */
 	for (done = 0;;) {
-		if ((ret = pthread_rwlock_wrlock(&g.append_lock)) != 0)
+		if ((ret = __wt_writelock(NULL, g.append_lock)) != 0)
 			die(ret, "pthread_rwlock_wrlock: append_lock");
 
 		/*
@@ -917,7 +917,7 @@ table_append(uint64_t keyno)
 					break;
 				}
 
-		if ((ret = pthread_rwlock_unlock(&g.append_lock)) != 0)
+		if ((ret = __wt_rwunlock(NULL, g.append_lock)) != 0)
 			die(ret, "pthread_rwlock_unlock: append_lock");
 
 		if (done)

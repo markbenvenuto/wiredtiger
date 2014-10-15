@@ -44,13 +44,13 @@ class test_compact(wttest.WiredTigerTestCase, suite_subprocess):
     # The table is a complex object, give it roughly 5 pages per underlying
     # file.
     types = [
-        ('file', dict(type='file:', pop=simple_populate, maxpages=5)),
+        #('file', dict(type='file:', pop=simple_populate, maxpages=5)),
         ('table', dict(type='table:', pop=complex_populate, maxpages=50))
         ]
     compact = [
         ('method', dict(utility=0,reopen=0)),
-        ('method_reopen', dict(utility=0,reopen=1)),
-        ('utility', dict(utility=1,reopen=0)),
+        #('method_reopen', dict(utility=0,reopen=1)),
+        #('utility', dict(utility=1,reopen=0)),
     ]
     scenarios = number_scenarios(multiply_scenarios('.', types, compact))
 

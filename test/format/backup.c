@@ -117,7 +117,7 @@ backup(void *arg)
 			break;
 
 		/* Lock out named checkpoints */
-		if ((ret = pthread_rwlock_wrlock(&g.backup_lock)) != 0)
+		if ((ret = __wt_writelock(NULL, g.backup_lock)) != 0)
 			die(ret, "pthread_rwlock_wrlock: backup lock");
 
 		/* Re-create the backup directory. */
@@ -144,7 +144,7 @@ backup(void *arg)
 		if ((ret = backup_cursor->close(backup_cursor)) != 0)
 			die(ret, "cursor.close");
 
-		if ((ret = pthread_rwlock_unlock(&g.backup_lock)) != 0)
+		if ((ret = __wt_rwunlock(NULL, g.backup_lock)) != 0)
 			die(ret, "pthread_rwlock_unlock: backup lock");
 
 		check_copy();

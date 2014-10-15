@@ -25,27 +25,7 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#include <sys/time.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-
-#include <assert.h>
-#include <ctype.h>
-#include <dirent.h>
-#include <errno.h>
-#include <fcntl.h>
-#include <inttypes.h>
-#include <limits.h>
-#include <math.h>
-#include <pthread.h>
-#include <stddef.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-
-#include <wiredtiger.h>
-#include <wiredtiger_ext.h>
+#include "wt_internal.h"
 
 #include "config_opt.h"
 

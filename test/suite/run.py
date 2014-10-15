@@ -46,6 +46,8 @@ elif os.path.isfile(os.path.join(wt_disttop, 'wt')):
     wt_builddir = wt_disttop
 elif os.path.isfile(os.path.join(wt_disttop, 'build_posix', 'wt')):
     wt_builddir = os.path.join(wt_disttop, 'build_posix')
+elif os.path.isfile(os.path.join(wt_disttop, 'wt.exe')):
+    wt_builddir = wt_disttop
 else:
     print 'Unable to find useable WiredTiger build'
     sys.exit(False)
@@ -303,7 +305,7 @@ if __name__ == '__main__':
     else:
         for arg in testargs:
             testsFromArg(tests, loader, arg)
-        
+
     if debug:
         import pdb
         pdb.set_trace()

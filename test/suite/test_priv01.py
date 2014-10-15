@@ -87,6 +87,10 @@ class test_priv01(wttest.WiredTigerTestCase):
         WIREDTIGER_HOME is set to homeenv, if it is not null.
         configextra are any extra configuration strings needed on the open.
         """
+
+        if not os.sys.platform == "win32":
+            self.skipTest('not supported on Windows')
+
         configarg = 'create'
         if configextra != None:
             configarg += ',' + configextra
@@ -127,7 +131,7 @@ class test_priv01(wttest.WiredTigerTestCase):
                 lambda: self.common_test(None, edir, None),
                 '/WIREDTIGER_HOME environment variable set but\
  process lacks privileges to use that environment variable/')
-    
+
     def test_env_conf_priv(self):
         edir = 'envdir'
         os.mkdir(edir)
