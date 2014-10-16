@@ -35,9 +35,8 @@
 #include <unistd.h>
 #else
 /* snprintf is not supported on <= VS2013 */
-#define snprintf _snprintf
+#define	snprintf _snprintf
 #endif
-
 
 #include <wiredtiger.h>
 

@@ -46,7 +46,6 @@
 #endif
 #include <sys/stat.h>
 
-
 #include <wiredtiger.h>
 
 int add_collator(WT_CONNECTION *conn);

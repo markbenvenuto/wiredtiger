@@ -104,13 +104,6 @@ get_next_incr(CONFIG *cfg)
 	return (WT_ATOMIC_ADD8(cfg->insert_key, 1));
 }
 
-/* Count number of async inserts completed. */
-/*static inline uint64_t
-async_next_incr(uint64_t *val)
-{
-	return (ATOMIC_ADD_PTR(val, 1));
-}*/
-
 static inline void
 generate_key(CONFIG *cfg, char *key_buf, uint64_t keyno)
 {
@@ -810,7 +803,7 @@ populate_thread(void *arg)
 		 */
 		cursor = cursors[op % cfg->table_count];
 		generate_key(cfg, key_buf, op);
-		measure_latency = 
+		measure_latency =
 		    cfg->sample_interval != 0 && trk->ops != 0 && (
 		    trk->ops % cfg->sample_rate == 0);
 		if (measure_latency &&
@@ -922,7 +915,7 @@ populate_async(void *arg)
 	 * will measure the time it takes to do all of them, including
 	 * the time to process by workers.
 	 */
-	measure_latency = 
+	measure_latency =
 	    cfg->sample_interval != 0 && trk->ops != 0 && (
 	    trk->ops % cfg->sample_rate == 0);
 	if (measure_latency &&
@@ -1289,7 +1282,7 @@ execute_populate(CONFIG *cfg)
 	msecs = ns_to_ms(WT_TIMEDIFF(stop, start));
 	lprintf(cfg, 0, 1,
 	    "Load time: %.2f\n" "load ops/sec: %" PRIu64,
-	    (double)msecs / (double)MSEC_PER_SEC, 
+	    (double)msecs / (double)MSEC_PER_SEC,
 	    (uint64_t)((cfg->icount / msecs) / MSEC_PER_SEC));
 
 	/*
@@ -1393,7 +1386,7 @@ execute_workload(CONFIG *cfg)
 
 	last_ckpts = last_inserts = last_reads = last_updates = 0;
 	ret = 0;
-	
+
 	if (cfg->warmup != 0)
 		cfg->in_warmup = 1;
 
@@ -1503,7 +1496,7 @@ err:	cfg->stop = 1;
 }
 
 /*
- * Ensure that icount matches the number of records in the 
+ * Ensure that icount matches the number of records in the
  * existing table.
  */
 static int
@@ -1755,7 +1748,7 @@ start_run(CONFIG *cfg)
 	monitor_created = ret = 0;
 					/* [-Wconditional-uninitialized] */
 	memset(&monitor_thread, 0, sizeof(monitor_thread));
-	
+
 	if ((ret = setup_log_file(cfg)) != 0)
 		goto err;
 
@@ -2228,7 +2221,7 @@ worker_throttle(int64_t throttle, int64_t *ops, struct timespec *interval)
 	if (__wt_epoch(NULL, &now) != 0)
 		return;
 
-	/* 
+	/*
 	 * If we've completed enough operations, reset the counters.
 	 * If we did enough operations in less than a second, sleep for
 	 * the rest of the second.

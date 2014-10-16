@@ -36,7 +36,7 @@
 
 #ifdef _WIN32
 /* snprintf is not supported on <= VS2013 */
-#define snprintf _snprintf
+#define	snprintf _snprintf
 #endif
 
 static const char *home;

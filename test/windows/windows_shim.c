@@ -30,16 +30,15 @@
 int sched_yield(void)
 {
 	(void)SwitchToThread();
-	return 0;
+	return (0);
 }
 
 int
 sleep(int seconds)
 {
 	Sleep(seconds * 1000);
-	return 0;
+	return (0);
 }
-
 
 int
 usleep(useconds_t useconds)
@@ -54,7 +53,7 @@ usleep(useconds_t useconds)
 
 int   pthread_rwlock_destroy(pthread_rwlock_t *lock)
 {
-	return 0;
+	return (0);
 }
 
 int   pthread_rwlock_init(pthread_rwlock_t *rwlock,
@@ -63,12 +62,12 @@ int   pthread_rwlock_init(pthread_rwlock_t *rwlock,
 	InitializeSRWLock(&rwlock->rwlock);
 	rwlock->exclusive_locked = 0;
 
-	return 0;
+	return (0);
 }
 int   pthread_rwlock_rdlock(pthread_rwlock_t *rwlock)
 {
 	AcquireSRWLockShared(&rwlock->rwlock);
-	return 0;
+	return (0);
 }
 int   pthread_rwlock_unlock(pthread_rwlock_t *rwlock)
 {
@@ -77,7 +76,7 @@ int   pthread_rwlock_unlock(pthread_rwlock_t *rwlock)
 		ReleaseSRWLockExclusive(&rwlock->rwlock);
 	} else
 		ReleaseSRWLockShared(&rwlock->rwlock);
-	return 0;
+	return (0);
 }
 int   pthread_rwlock_wrlock(pthread_rwlock_t *rwlock)
 {
@@ -94,10 +93,10 @@ int   pthread_create(pthread_t *tidret, const pthread_attr_t *ignored,
 	*tidret = CreateThread(NULL, 0, func, arg, 0, NULL);
 	if (*tidret != NULL)
 		return (0);
-	return 1;
+	return (1);
 }
 int   pthread_join(pthread_t thread, void **ignored)
 {
 	WaitForSingleObject(thread, INFINITE);
-	return 0;
+	return (0);
 }

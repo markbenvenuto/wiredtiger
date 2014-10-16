@@ -27,30 +27,30 @@
 
 #ifdef _WIN32
 
-#define WIN32_LEAN_AND_MEAN
+#define	WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <stdint.h>
 #include <direct.h>
 #include <io.h>
 
-#define inline __inline
+#define	inline __inline
 
 /* Define some POSIX types */
 typedef int u_int;
 
 /* Windows does not define constants for access() */
-#define R_OK 04
-#define X_OK R_OK
+#define	R_OK 04
+#define	X_OK R_OK
 
-#define getpid() 0
+#define	getpid() 0
 
 /* snprintf does not exist on <= VS 2013 */
-#define snprintf _snprintf
+#define	snprintf _snprintf
 
 /*
  * Emulate <sys/stat.h>
  */
-#define mkdir(path, mode) _mkdir(path)
+#define	mkdir(path, mode) _mkdir(path)
 
 /*
  * Emulate <sched.h>
@@ -68,7 +68,7 @@ sleep(int seconds);
 int
 usleep(useconds_t useconds);
 
-#define BERKELEY_DB_PATH "d:\\wt\\bdb"
+#define	BERKELEY_DB_PATH "d:\\wt\\bdb"
 
 /*
  * Emulate the <pthread.h> support we need for the tests

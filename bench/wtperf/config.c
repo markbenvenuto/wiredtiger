@@ -362,7 +362,7 @@ config_opt(CONFIG *cfg, WT_CONFIG_ITEM *k, WT_CONFIG_ITEM *v)
 				return (enomem(cfg));
 			snprintf(newstr, newlen,
 			    "%s,%*s", *strp, (int)v->len, v->str);
-            newstr[newlen - 1] = '\0';
+	    newstr[newlen - 1] = '\0';
 			/* Free the old value now we've copied it. */
 			free(*strp);
 		}
@@ -431,9 +431,9 @@ config_opt_file(CONFIG *cfg, const char *filename)
 	read_size = read(fd, file_buf, buf_size);
 	if (read_size == -1 
 #ifndef _WIN32 /* Windows automatically translates \r\n -> \n so counts will be off */
-        || (size_t)read_size != buf_size
+	|| (size_t)read_size != buf_size
 #endif
-        ) {
+	) {
 		fprintf(stderr,
 		    "wtperf: read unexpected amount from config file\n");
 		ret = EINVAL;
