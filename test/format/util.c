@@ -298,11 +298,18 @@ path_setup(const char *home)
 	 * salvage command as necessary.
 	 */
 #undef	CMD
+#ifdef _WIN32
+#define	CMD								\
+	"cd %s && "							\
+	"rd /q /s slvg.copy & mkdir slvg.copy && "			\
+	"copy WiredTiger* slvg.copy\\ && copy wt* slvg.copy\\"
+#else
 #define	CMD								\
 	"cd %s && "							\
 	"rm -rf slvg.copy && mkdir slvg.copy && "			\
 	"cp WiredTiger* wt* slvg.copy/"
-	len = strlen(g.home) +  strlen(CMD) + 1;
+#endif
+    len = strlen(g.home) + strlen(CMD) + 1;
 	if ((g.home_salvage_copy = malloc(len)) == NULL)
 		die(errno, "malloc");
 	snprintf(g.home_salvage_copy, len, CMD, g.home);

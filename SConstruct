@@ -24,6 +24,7 @@ AddOption("--enable-swig", dest="swig", type="string", nargs=1, action="store",
 env = Environment(
     CPPPATH = ["#/src/include/",
                "#/build_win",
+               "#/test/windows",
                "#/.",
                distutils.sysconfig.get_python_inc()
            ],
@@ -191,6 +192,10 @@ if GetOption("swig"):
                       SHLIBSUFFIX=".pyd",
                       LIBS=[wtlib])
 
+# Shim library of functions to emulate POSIX on Windows
+shim = env.Library("window_shim",
+        ["test/windows/windows_shim.c"])
+
 env.Program("t_bloom",
     "test/bloom/test_bloom.c",
     LIBS=[wtlib])
@@ -201,9 +206,9 @@ env.Program("t_bloom",
     #"test/checkpoint/workers.c"],
     #LIBS=[wtlib])
 
-#env.Program("t_huge",
-    #"test/huge/huge.c",
-    #LIBS=[wtlib])
+env.Program("t_huge",
+    "test/huge/huge.c",
+    LIBS=[wtlib])
 
 #env.Program("t_fops",
     #["test/fops/file.c",
@@ -227,7 +232,7 @@ if useBdb:
         "test/format/t.c",
         "test/format/util.c",
         "test/format/wts.c"],
-         LIBS=[wtlib, "libdb61"])
+         LIBS=[wtlib, shim, "libdb61"])
 
 #env.Program("t_thread",
     #["test/thread/file.c",
@@ -240,37 +245,39 @@ if useBdb:
     #["test/salvage/salvage.c"],
     #LIBS=[wtlib])
 
-#env.Program("wtperf", [
-    #"bench/wtperf/config.c",
-    #"bench/wtperf/misc.c",
-    #"bench/wtperf/track.c",
-    #"bench/wtperf/wtperf.c"],
-    #LIBS=[wtlib] )
+env.Program("wtperf", [
+    "bench/wtperf/config.c",
+    "bench/wtperf/misc.c",
+    "bench/wtperf/track.c",
+    "bench/wtperf/wtperf.c",
+    ],
+    LIBS=[wtlib, shim] )
 
 examples = [
     "ex_access",
-    #"ex_all",
-    #"ex_async",
+    "ex_all",
+    "ex_async",
     "ex_call_center",
     "ex_config",
     "ex_config_parse",
     "ex_cursor",
     "ex_data_source",
-    #"ex_extending",
+    "ex_extending",
     "ex_file",
     "ex_hello",
-    #"ex_log",
+    "ex_log",
     "ex_pack",
     "ex_process",
     "ex_schema",
-    #"ex_scope",
+    "ex_scope",
     "ex_stat",
-    #"ex_thread",
+    "ex_thread",
     ]
 
 for ex in examples:
-    env.Program(ex, "examples/c/" + ex + ".c", LIBS=[wtlib])
-
-
+    if(ex in ['ex_async', 'ex_thread']):
+        env.Program(ex, "examples/c/" + ex + ".c", LIBS=[wtlib, shim])
+    else:
+        env.Program(ex, "examples/c/" + ex + ".c", LIBS=[wtlib])
 
 

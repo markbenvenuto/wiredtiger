@@ -7,8 +7,6 @@
 
 #include "wt_internal.h"
 
-#define WT_STAT_FAST_CONN_INCR(x, y)
-
 /*
  * __wt_cond_alloc --
  *	Allocate and initialize a condition variable.

@@ -27,23 +27,6 @@
 
 #include "wtperf.h"
 
-#ifdef _WIN32
-typedef uint32_t useconds_t;
-
-#define sleep Sleep
-
-int
-usleep(useconds_t useconds)
-{
-    uint32_t milli;
-    milli = useconds / 1000;
-    if (milli == 0)
-	    milli++;
-    Sleep(milli);
-    return (0);
-}
-#endif
-
 /* Default values. */
 static const CONFIG default_cfg = {
 	"WT_TEST",			/* home */

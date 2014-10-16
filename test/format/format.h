@@ -25,28 +25,40 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
-#define __STDC__ 0
-
 #include <sys/stat.h>
+#ifndef _WIN32
+#include <sys/time.h>
+#endif
 #include <sys/types.h>
 
 #include <assert.h>
 #include <ctype.h>
-#include <direct.h>
 #include <errno.h>
+#include <fcntl.h>
 #include <inttypes.h>
 #include <limits.h>
+#ifndef _WIN32
+#include <pthread.h>
+#endif
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifndef _WIN32
+#include <unistd.h>
+#endif
+#include <time.h>
+
+#ifdef _WIN32
+#include "windows_shim.h"
+#endif
 
 #ifdef BDB
 #include <db.h>
 #endif
+#include <wiredtiger.h>
 
-#include <wt_internal.h>
-#include "windows_shim.h"
+#include <wiredtiger_ext.h>
 
 extern WT_EXTENSION_API *wt_api;
 
@@ -122,7 +134,7 @@ typedef struct {
 	int track;				/* Track progress */
 	int threads_finished;			/* Operations completed */
 
-	WT_RWLOCK* backup_lock;			/* Hot backup running */
+	pthread_rwlock_t backup_lock;		/* Hot backup running */
 
 	/*
 	 * We have a list of records that are appended, but not yet "resolved",
@@ -132,7 +144,7 @@ typedef struct {
 	uint64_t *append;			/* Appended records */
 	size_t    append_max;			/* Maximum unresolved records */
 	size_t	  append_cnt;			/* Current unresolved records */
-	WT_RWLOCK* append_lock;			/* Single-thread resolution */
+	pthread_rwlock_t append_lock;		/* Single-thread resolution */
 
 	char *uri;				/* Object name */
 

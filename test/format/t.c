@@ -157,9 +157,9 @@ main(int argc, char *argv[])
 	 * Initialize locks to single-thread named checkpoints and backups, and
 	 * to single-thread last-record updates.
 	 */
-	if ((ret = __wt_rwlock_alloc(NULL, &g.append_lock, "append")) != 0)
+	if ((ret = pthread_rwlock_init(&g.append_lock, NULL)) != 0)
 		die(ret, "pthread_rwlock_init: append lock");
-	if ((ret = __wt_rwlock_alloc(NULL, &g.backup_lock, "backup")) != 0)
+	if ((ret = pthread_rwlock_init(&g.backup_lock, NULL)) != 0)
 		die(ret, "pthread_rwlock_init: backup lock");
 
 	/* Seed the random number generator. */
@@ -242,9 +242,9 @@ main(int argc, char *argv[])
 
 	config_print(0);
 
-	if ((ret = __wt_rwlock_destroy(NULL, &g.append_lock)) != 0)
+	if ((ret = pthread_rwlock_destroy(&g.append_lock)) != 0)
 		die(ret, "pthread_rwlock_destroy: append lock");
-	if ((ret = __wt_rwlock_destroy(NULL, &g.backup_lock)) != 0)
+	if ((ret = pthread_rwlock_destroy(&g.backup_lock)) != 0)
 		die(ret, "pthread_rwlock_destroy: backup lock");
 
 	config_clear();
@@ -292,7 +292,7 @@ startup(void)
 	if (g.logging != 0) {
 		if ((g.logfp = fopen(g.home_log, "w")) == NULL)
 			die(errno, "fopen: %s", g.home_log);
-		(void)setvbuf(g.logfp, NULL, _IOLBF, 32);
+		(void)setvbuf(g.logfp, NULL, _IOLBF, 0);
 	}
 
 	/*
