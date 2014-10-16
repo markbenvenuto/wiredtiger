@@ -93,7 +93,6 @@ static uint64_t	 wtperf_value_range(CONFIG *);
  * wtperf uses internal WiredTiger library routines for timing and generating
  * random numbers.
  */
-extern int	__wt_epoch(void *, struct timespec *);
 extern uint32_t	__wt_random(uint32_t *);
 extern void	__wt_random_init(uint32_t *);
 

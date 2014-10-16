@@ -55,7 +55,7 @@
 	(i = (x == 0) ? (int)sizeof (x) : __builtin_clzll(x) >> 3)
 #elif defined(_MSC_VER)
 #define	WT_LEADING_ZEROS(x, i)	do {					\
-	if( x == 0) i = (int)sizeof(x);					\
+	if (x == 0) i = (int)sizeof(x);				\
 	else  { 							\
 		unsigned long __index;					\
 		_BitScanReverse64(&__index, x);				\
