@@ -25,7 +25,25 @@
  * OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#include <sys/types.h>
+#include <sys/stat.h>
+
+#include <assert.h>
+#include <ctype.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <inttypes.h>
+#include <limits.h>
+#include <math.h>
+#include <stddef.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "wt_internal.h"
+
+#ifdef _WIN32
+#include "windows_shim.h"
+#endif
 
 #include "config_opt.h"
 

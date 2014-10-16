@@ -80,7 +80,7 @@
 /* #undef HAVE_POSIX_MADVISE */
 
 /* Define to 1 if you have the `posix_memalign' function. */
-#define HAVE_POSIX_MEMALIGN 1
+/* #undef HAVE_POSIX_MEMALIGN */
 
 /* Define to 1 if you have the <pthread_np.h> header file. */
 /* #undef HAVE_PTHREAD_NP_H */
