@@ -16,9 +16,9 @@ _Check_return_opt_ int __cdecl _wt_vsnprintf(
 	int len;
 
 	/*
-	 * Wiretiger will call with length 0 to get the needed buffer size
-	 * We call _vscprintf in this case since vsnprintf_s assumes length
-	 * is greater than zero or else it triggers the invalid_parameter
+	 * WiredTiger will call with length 0 to get the needed buffer size
+	 * We call the count only version in this case since vsnprintf_s assumes
+	 * length is greater than zero or else it triggers the invalid_parameter
 	 * handler.
 	 */
 	if (_MaxCount == 0) {
