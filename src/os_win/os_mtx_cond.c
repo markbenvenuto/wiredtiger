@@ -41,7 +41,7 @@ __wt_cond_alloc(WT_SESSION_IMPL *session,
  *	Wait on a mutex, optionally timing out.
  */
 int
-__wt_cond_wait(WT_SESSION_IMPL *session, WT_CONDVAR *cond, long usecs)
+__wt_cond_wait(WT_SESSION_IMPL *session, WT_CONDVAR *cond, uint64_t usecs)
 {
 	WT_DECL_RET;
 	int locked;
