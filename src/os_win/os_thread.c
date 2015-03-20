@@ -8,6 +8,30 @@
 
 #include "wt_internal.h"
 
+struct thread_params_t {
+	void* args;
+	void *( *callback )( void * );
+};
+
+/*
+ * __wt_thread_start --
+ *	Thread entry point for Windows Threads
+ */
+unsigned
+__stdcall
+__wt_thread_start(void * arg)
+{
+	struct thread_params_t* params;
+
+	params = (struct thread_params_t*)arg;
+
+	params->callback(params->args);
+
+	__wt_free(NULL, params);
+
+	return 0;
+}
+
 /*
  * __wt_thread_create --
  *	Create a new thread of control.
@@ -16,12 +40,20 @@ int
 __wt_thread_create(WT_SESSION_IMPL *session,
     wt_thread_t *tidret, void *(*func)(void *), void *arg)
 {
+	struct thread_params_t* params;
+
+	WT_RET( __wt_calloc_one(NULL, &params));
+
+	params->args = arg;
+	params->callback = func;
+
 	/* Spawn a new thread of control. */
-	*tidret = CreateThread(NULL, 0, func, arg, 0, NULL);
-	if (*tidret != NULL)
+	*tidret = (HANDLE)_beginthreadex(NULL, 0, __wt_thread_start, params,
+	    0, NULL);
+	if (*tidret != 0)
 		return (0);
 
-	WT_RET_MSG(session, __wt_errno(), "CreateThread");
+	WT_RET_MSG(session, errno, "_beginthreadex");
 }
 
 /*

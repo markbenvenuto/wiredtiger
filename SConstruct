@@ -97,6 +97,8 @@ var.Add('TOOLS', 'SCons tools', [
     "textfile"
 ])
 
+var.Add('SWIG', 'SWIG binary location', swig_binary)
+
 env = Environment(
     variables = var
 )
