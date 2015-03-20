@@ -68,7 +68,11 @@ var.Add('CFLAGS', 'C Compiler Flags', [
     "/wd4090", # Ignore warning about mismatched const qualifiers
     "/wd4996", # Ignore deprecated functions
     "/W3", # Warning level 3
+    #"/we4244", # Possible loss of data
     "/we4013", # Error on undefined functions
+    "/we4047", # Indirection differences in types
+    "/we4024", # Differences in parameter types
+    "/we4100", # Unreferenced local parameter
     "/TC", # Compile as C code
     #"/Od", # Disable optimization
     "/Ob1", # inline expansion
@@ -76,7 +80,7 @@ var.Add('CFLAGS', 'C Compiler Flags', [
     "/GF", # enable string pooling
     "/EHsc", # extern "C" does not throw
     #"/RTC1", # enable stack checks
-    "/GS", # enable secrutiy checks
+    "/GS", # enable security checks
     "/Gy", # separate functions for linker
     "/Zc:wchar_t",
     "/Gd",

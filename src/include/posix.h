@@ -26,3 +26,8 @@
 typedef pthread_cond_t		wt_cond_t;
 typedef pthread_mutex_t		wt_mutex_t;
 typedef pthread_t		wt_thread_t;
+
+/*
+ * Thread callbacks need to match the return signature of _beginthreadex.
+ */
+#define WT_THREAD_RET 	void*

@@ -10,13 +10,13 @@
 
 static int   __evict_clear_walks(WT_SESSION_IMPL *);
 static int   __evict_has_work(WT_SESSION_IMPL *, uint32_t *);
-static int   __evict_lru_cmp(const void *, const void *);
+static int   WT_CDECL __evict_lru_cmp(const void *, const void *);
 static int   __evict_lru_pages(WT_SESSION_IMPL *, int);
 static int   __evict_lru_walk(WT_SESSION_IMPL *, uint32_t);
 static int   __evict_pass(WT_SESSION_IMPL *);
 static int   __evict_walk(WT_SESSION_IMPL *, uint32_t);
 static int   __evict_walk_file(WT_SESSION_IMPL *, u_int *, uint32_t);
-static void *__evict_worker(void *);
+static WT_THREAD_RET __evict_worker(void *);
 static int __evict_server_work(WT_SESSION_IMPL *);
 
 /*
@@ -54,7 +54,7 @@ __evict_read_gen(const WT_EVICT_ENTRY *entry)
  * __evict_lru_cmp --
  *	Qsort function: sort the eviction array.
  */
-static int
+static int WT_CDECL
 __evict_lru_cmp(const void *a, const void *b)
 {
 	uint64_t a_lru, b_lru;
@@ -150,7 +150,7 @@ __wt_evict_server_wake(WT_SESSION_IMPL *session)
  * __evict_server --
  *	Thread to evict pages from the cache.
  */
-static void *
+static WT_THREAD_RET
 __evict_server(void *arg)
 {
 	WT_CACHE *cache;
@@ -232,7 +232,7 @@ __evict_server(void *arg)
 	if (0) {
 err:		WT_PANIC_MSG(session, ret, "cache eviction server error");
 	}
-	return (NULL);
+	return (0);
 }
 
 /*
@@ -376,7 +376,7 @@ __wt_evict_destroy(WT_SESSION_IMPL *session)
  * __evict_worker --
  *	Thread to help evict pages from the cache.
  */
-static void *
+static WT_THREAD_RET
 __evict_worker(void *arg)
 {
 	WT_CACHE *cache;
@@ -405,7 +405,7 @@ __evict_worker(void *arg)
 	if (0) {
 err:		WT_PANIC_MSG(session, ret, "cache eviction worker error");
 	}
-	return (NULL);
+	return (0);
 }
 
 /*
