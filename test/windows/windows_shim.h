@@ -38,7 +38,7 @@
 #define	inline __inline
 
 /* Define some POSIX types */
-typedef int u_int;
+typedef uint32_t u_int;
 
 /* Windows does not define constants for access() */
 #define	R_OK 04

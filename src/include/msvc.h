@@ -18,7 +18,14 @@
 /*
  * Add MSVC-specific attributes and pragmas to types and function declarations.
  */
+#ifdef __clang__
+/*
+ * Clang 3.6 does not support aligned types to > 32 on Windows
+ */
+#define	WT_COMPILER_TYPE_ALIGN(x)
+#else
 #define	WT_COMPILER_TYPE_ALIGN(x)	__declspec(align(x))
+#endif
 
 #define	WT_PACKED_STRUCT_BEGIN(name)					\
 	__pragma(pack(push,1))						\

@@ -1218,9 +1218,7 @@ __wt_cksum_hw(const void *chunk, size_t len)
 	}
 	return (~crc);
 }
-#endif
-
-#if defined(_M_AMD64)
+#elif defined(_M_AMD64) /* MSVC */
 /*
  * __wt_cksum_hw --
  *	Return a checksum for a chunk of memory, computed in hardware

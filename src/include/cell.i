@@ -649,7 +649,7 @@ restart:
 		WT_RET(__wt_vunpack_uint(
 		    &p, end == NULL ? 0 : (size_t)(end - p), &v));
 		copy.len = WT_PTRDIFF32(p, cell);
-		copy.v = unpack->v;
+		copy.v = (int32_t)unpack->v;
 		cell = (WT_CELL *)((uint8_t *)cell - v);
 		goto restart;
 
@@ -702,7 +702,7 @@ restart:
 done:	WT_CELL_LEN_CHK(cell, unpack->__len);
 	if (copy.len != 0) {
 		unpack->raw = WT_CELL_VALUE_COPY;
-		unpack->__len = copy.len;
+		unpack->__len = (int32_t)copy.len;
 		unpack->v = copy.v;
 	}
 

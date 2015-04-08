@@ -98,7 +98,7 @@ var.Add('LINKFLAGS', 'Linker Flags', [
 var.Add('TOOLS', 'SCons tools', [
     "default",
     "swig",
-    "textfile"
+    "textfile",
 ])
 
 var.Add('SWIG', 'SWIG binary location', swig_binary)
@@ -115,10 +115,34 @@ useLz4 = GetOption("lz4")
 useBdb = GetOption("bdb")
 wtlibs = []
 
-conf = Configure(env)
+# Check for clang-cl.exe
+def CheckClang(context):
+    test_body = """
+    #if !defined(__clang__)
+    #error Not using Clang
+    #endif
+    int i = 0;
+    """
+
+    context.Message('Checking for Clang-Cl... ')
+    ret = context.TryCompile(textwrap.dedent(test_body), ".c")
+    context.Result(ret)
+    return ret
+
+conf = Configure(env, custom_tests = {
+    'CheckClang' : CheckClang,
+})
+
 if not conf.CheckCHeader('stdlib.h'):
     print 'stdlib.h must be installed!'
     Exit(1)
+
+if conf.CheckClang():
+    conf.env.Append(CFLAGS=[
+        "-m64", # Force clang-cl.exe to target 64
+        "-Wno-ignored-attributes",
+        "-Wno-deprecated-declarations",
+    ])
 
 if useZlib:
     conf.env.Append(CPPPATH=[useZlib + "/include"])
