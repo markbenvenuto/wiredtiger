@@ -181,6 +181,8 @@ LevelDB
 Levyx
 Llqr
 Llqrt
+LoadLoad
+LoadStore
 LockFile
 Lookaside
 Lookup
@@ -281,14 +283,18 @@ SiH
 Skiplist
 SleepConditionVariableCS
 Solaris
+Sparc
 Spinlock
 Spinlocks
 Split's
 Stoica
+StoreLoad
+StoreStore
 TAILQ
 TCMalloc
 TODO
 TORTIOUS
+TSO
 TXN
 TXNC
 Timespec
@@ -303,6 +309,7 @@ ULINE
 URI
 URIs
 UTF
+UltraSparc
 Unbuffered
 UnixLib
 Unmap
@@ -415,6 +422,7 @@ bzip
 calloc
 cas
 catfmt
+ccr
 cd
 centric
 cfg
