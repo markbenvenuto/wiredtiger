@@ -175,6 +175,8 @@ LevelDB
 Levyx
 Llqr
 Llqrt
+LoadLoad
+LoadStore
 LockFile
 Lookup
 MALLOC
@@ -269,14 +271,18 @@ SiH
 Skiplist
 SleepConditionVariableCS
 Solaris
+Sparc
 Spinlock
 Spinlocks
 Split's
 Stoica
+StoreLoad
+StoreStore
 TAILQ
 TCMalloc
 TODO
 TORTIOUS
+TSO
 TXN
 TXNC
 Timespec
@@ -396,6 +402,7 @@ bzfree
 bzip
 calloc
 catfmt
+ccr
 cd
 centric
 cfg
