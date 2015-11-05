@@ -79,7 +79,7 @@ __wt_open(WT_SESSION_IMPL *session,
 		dwCreationDisposition = OPEN_EXISTING;
 
 	/*
-         * direct_io means no OS file caching. This requires aligned buffer
+	 * direct_io means no OS file caching. This requires aligned buffer
 	 * allocations like O_DIRECT.
 	 */
 	if (dio_type && FLD_ISSET(conn->direct_io, dio_type)) {

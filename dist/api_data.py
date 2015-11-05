@@ -677,7 +677,7 @@ wiredtiger_open_common = connection_runtime_config + [
             choices=['dsync', 'fsync', 'none']),
         ]),
     Config('write_through', '', r'''
-        Use \c FILE_FLAG_WRITE_THROUGHT on Windows to write to files.
+        Use \c FILE_FLAG_WRITE_THROUGH on Windows to write to files.
         Options are given as a list,
         such as <code>"write_through=[data]"</code>.  Configuring
         \c write_through requires care, see @ref
