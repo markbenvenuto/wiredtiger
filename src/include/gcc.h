@@ -177,12 +177,17 @@ __wt_atomic_cas_ptr(void *vp, void *old, void *new)
 #define	WT_WRITE_BARRIER()	WT_FULL_BARRIER()
 
 #elif defined(__PPC64__) || defined(PPC64)
+/* ori 0,0,0 is the PCP64 noop instruction */
 #define	WT_PAUSE()	__asm__ volatile("ori 0,0,0" ::: "memory")
-#define	WT_FULL_BARRIER()	do {
+#define	WT_FULL_BARRIER()	do {					\
 	__asm__ volatile ("sync" ::: "memory");				\
 } while (0)
-#define	WT_READ_BARRIER()	WT_FULL_BARRIER()
-#define	WT_WRITE_BARRIER()	WT_FULL_BARRIER()
+#define	WT_READ_BARRIER()	do {i					\
+	__asm__ volatile ("lwsync" ::: "memory");			\
+} while (0)
+#define	WT_WRITE_BARRIER()	do {					\
+	__asm__ volatile ("lwsync" ::: "memory");			\
+} while (0)
 
 #elif defined(__aarch64__)
 #define	WT_PAUSE()	__asm__ volatile("yield" ::: "memory")
