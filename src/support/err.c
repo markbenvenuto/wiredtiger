@@ -169,6 +169,8 @@ __wt_eventv(WT_SESSION_IMPL *session, bool msg_event, int error,
 	 */
 	char s[2048];
 
+	//DebugBreak();
+
 	/*
 	 * !!!
 	 * This function MUST handle a NULL WT_SESSION_IMPL handle.
