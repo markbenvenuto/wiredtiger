@@ -76,13 +76,14 @@ var.Add('CFLAGS', 'C Compiler Flags', [
     #"/we4047", # Indirection differences in types
     #"/we4024", # Differences in parameter types
     #"/we4100", # Unreferenced local parameter
+    "/we4133", # incompatible types
     "/TC", # Compile as C code
-    #"/Od", # Disable optimization
+    "/Od", # Disable optimization
     "/Ob1", # inline expansion
-    "/O2", # optimize for speed
+    #"/O2", # optimize for speed
     "/GF", # enable string pooling
     "/EHsc", # extern "C" does not throw
-    #"/RTC1", # enable stack checks
+    "/RTC1", # enable stack checks
     "/GS", # enable security checks
     "/Gy", # separate functions for linker
     "/Zc:wchar_t",
@@ -441,7 +442,7 @@ t = env.Program("t_fops",
     "test/fops/t.c"],
     LIBS=[wtlib, shim, testutil] + wtlibs)
 env.Append(CPPPATH=["test/utility"])
-env.Alias("check", env.SmokeTest(t))
+#env.Alias("check", env.SmokeTest(t))
 Default(t)
 
 if useBdb:
