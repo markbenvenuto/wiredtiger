@@ -48,8 +48,8 @@ __wt_win_directory_list(WT_FILE_SYSTEM *file_system,
 	WT_ERR(__wt_scr_alloc(session, pathlen + 3, &pathbuf));
 	WT_ERR(__wt_buf_fmt(session, pathbuf, "%s\\*", dir_copy));
 
-	WT_ERR(__wt_to_wide_string(session, pathbuf->data, &pathbuf_wide));
-	WT_ERR(__wt_to_wide_string(session, prefix, &prefix_wide));
+	WT_ERR(__wt_to_utf16_string(session, pathbuf->data, &pathbuf_wide));
+	WT_ERR(__wt_to_utf16_string(session, prefix, &prefix_wide));
 	prefix_widelen = wcslen(prefix_wide->data);
 
 	findhandle = FindFirstFileW(pathbuf_wide->data, &finddata);

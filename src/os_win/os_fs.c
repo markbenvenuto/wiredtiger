@@ -25,7 +25,7 @@ __win_fs_exist(WT_FILE_SYSTEM *file_system,
 	session = (WT_SESSION_IMPL *)wt_session;
 	*existp = false;
 
-	WT_ERR(__wt_to_wide_string(session, name, &name_wide));
+	WT_RET(__wt_to_utf16_string(session, name, &name_wide));
 
 	if (GetFileAttributesW(name_wide->data) != INVALID_FILE_ATTRIBUTES)
 		*existp = true;
@@ -55,7 +55,7 @@ __win_fs_remove(WT_FILE_SYSTEM *file_system,
 
 	session = (WT_SESSION_IMPL *)wt_session;
 
-	WT_ERR(__wt_to_wide_string(session, name, &name_wide));
+	WT_RET(__wt_to_utf16_string(session, name, &name_wide));
 
 	if (DeleteFileW(name_wide->data) == FALSE) {
 		windows_error = __wt_getlasterror();
@@ -90,8 +90,8 @@ __win_fs_rename(WT_FILE_SYSTEM *file_system,
 
 	session = (WT_SESSION_IMPL *)wt_session;
 
-	WT_ERR(__wt_to_wide_string(session, from, &from_wide));
-	WT_ERR(__wt_to_wide_string(session, to, &to_wide));
+	WT_ERR(__wt_to_utf16_string(session, from, &from_wide));
+	WT_ERR(__wt_to_utf16_string(session, to, &to_wide));
 
 	/*
 	 * Check if file exists since Windows does not override the file if
@@ -139,7 +139,7 @@ __wt_win_fs_size(WT_FILE_SYSTEM *file_system,
 
 	session = (WT_SESSION_IMPL *)wt_session;
 
-	WT_ERR(__wt_to_wide_string(session, name, &name_wide));
+	WT_ERR(__wt_to_utf16_string(session, name, &name_wide));
 
 	if (GetFileAttributesExW(name_wide->data, GetFileExInfoStandard,
 				 &data) == 0) {
@@ -483,7 +483,7 @@ __win_open_file(WT_FILE_SYSTEM *file_system, WT_SESSION *wt_session,
 
 	WT_RET(__wt_calloc_one(session, &win_fh));
 
-	WT_ERR(__wt_to_wide_string(session, name, &name_wide));
+	WT_ERR(__wt_to_utf16_string(session, name, &name_wide));
 
 	win_fh->direct_io = false;
 
