@@ -29,6 +29,7 @@
 
 #ifdef _WIN32
 	#define DIR_DELIM '\\'
+	#define DIR_EXISTS_COMMAND "IF EXIST "
 	#define RM_COMMAND "rd /s /q "
 #else
 	#define	DIR_DELIM '/'
