@@ -412,7 +412,8 @@ env.Append(BUILDERS={'SmokeTest' : Builder(action = builder_smoke_test)})
 testutil = env.Library('testutil',
             [
                 'test/utility/misc.c',
-                'test/utility/parse_opts.c'
+                'test/utility/parse_opts.c',
+                'test/utility/thread.c',
             ])
 
 #Don't test bloom on Windows, its broken
@@ -446,25 +447,20 @@ env.Append(CPPPATH=["test/utility"])
 env.Alias("check", env.SmokeTest(t))
 Default(t)
 
-if useBdb:
-    benv = env.Clone()
-
-    benv.Append(CPPDEFINES=['BERKELEY_DB_PATH=\\"' + useBdb.replace("\\", "\\\\") + '\\"'])
-
-    t = benv.Program("t_format",
-        ["test/format/backup.c",
-        "test/format/bdb.c",
-        "test/format/bulk.c",
-        "test/format/compact.c",
-        "test/format/config.c",
-        "test/format/ops.c",
-        "test/format/salvage.c",
-        "test/format/t.c",
-        "test/format/util.c",
-        "test/format/wts.c"],
-         LIBS=[wtlib, shim, "libdb61"] + wtlibs)
-    env.Alias("test", env.SmokeTest(t))
-    Default(t)
+t = env.Program("t_format",
+    ["test/format/backup.c",
+    "test/format/bulk.c",
+    "test/format/compact.c",
+    "test/format/config.c",
+    "test/format/lrt.c",
+    "test/format/ops.c",
+    "test/format/rebalance.c",
+    "test/format/salvage.c",
+    "test/format/t.c",
+    "test/format/util.c",
+    "test/format/wts.c"],
+     LIBS=[wtlib, shim, testutil] + wtlibs)
+Default(t)
 
 #env.Program("t_thread",
     #["test/thread/file.c",
@@ -488,6 +484,22 @@ t = env.Program("wtperf", [
     ],
     LIBS=[wtlib, shim, testutil] + wtlibs)
 Default(t)
+
+
+csuite_tests = [
+    'wt1965_col_efficiency',
+    'wt2246_col_append',
+    'wt2447_join_main_table',
+    'wt2535_insert_race',
+    'wt2592_join_schema',
+    'wt2719_reconfig',
+    'wt2834_join_bloom_fix',
+    ]
+
+for test in csuite_tests:
+    exp = env.Program(test, "test/csuite/" + test  +"/main.c", LIBS=[wtlib, shim, testutil] + wtlibs)
+    Default(exp)
+    env.Alias("check", env.SmokeTest(exp))
 
 #Build the Examples
 for ex in examples:
