@@ -494,6 +494,7 @@ csuite_tests = [
     'wt2592_join_schema',
     'wt2719_reconfig',
     'wt2834_join_bloom_fix',
+    'wt2853_perf',
     ]
 
 for test in csuite_tests:
