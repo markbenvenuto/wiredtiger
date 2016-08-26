@@ -320,8 +320,8 @@ path_setup(const char *home)
 #undef	CMD
 #ifdef _WIN32
 #define	CMD    "(IF NOT EXIST %s MKDIR %s ) & "                \
-        "CD %s && ATTRIB +r rand && DEL /s /a-r /q * > NUL && ATTRIB -r rand & "        \
-        "IF NOT EXIST KVS MKDIR KVS"
+	"CD %s && ATTRIB +r rand && DEL /s /a-r /q * > NUL && " \
+	"ATTRIB -r rand & IF NOT EXIST KVS MKDIR KVS"
 #else
 #define	CMD	"test -e %s || mkdir %s; "				\
 		"cd %s > /dev/null && rm -rf `ls | sed /rand/d`; "	\
