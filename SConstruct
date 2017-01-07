@@ -10,10 +10,6 @@ import distutils.sysconfig
 
 EnsureSConsVersion( 2, 0, 0 )
 
-if not os.sys.platform == "win32":
-    print ("SConstruct is only supported for Windows, use build_posix for other platforms")
-    Exit(1)
-
 # Command line options
 #
 AddOption("--dynamic-crt", dest="dynamic-crt", action="store_true", default=False,
@@ -49,6 +45,8 @@ AddOption("--prefix", dest="prefix", type="string", nargs=1, action="store", def
 AddOption("--with-berkeley-db", dest="bdb", type="string", nargs=1, action="store",
           help="Berkeley DB install path, ie, /usr/local")
 
+AddOption("--ninja", dest="ninja", action="store_true", default=False,
+          help="Ninja")
 # Get the swig binary from the command line option since SCONS cannot find it automatically
 #
 swig_binary = GetOption("lang-python")
@@ -61,41 +59,9 @@ var.Add('MSVC_USE_SCRIPT', 'Path to vcvars.bat to override SCons default VS tool
 
 var.Add('CPPPATH', 'C Preprocessor include path', [
     "#/src/include/",
-    "#/build_win",
-    "#/test/windows",
+    #"#/build_win",
+    #"#/test/windows",
     "#/.",
-])
-
-var.Add('CFLAGS', 'C Compiler Flags', [
-    "/Z7", # Generate debugging symbols
-    "/wd4090", # Ignore warning about mismatched const qualifiers
-    "/wd4996", # Ignore deprecated functions
-    "/W3", # Warning level 3
-    #"/we4244", # Possible loss of data
-    "/we4013", # Error on undefined functions
-    #"/we4047", # Indirection differences in types
-    #"/we4024", # Differences in parameter types
-    #"/we4100", # Unreferenced local parameter
-    "/TC", # Compile as C code
-    #"/Od", # Disable optimization
-    "/Ob1", # inline expansion
-    "/O2", # optimize for speed
-    "/GF", # enable string pooling
-    "/EHsc", # extern "C" does not throw
-    #"/RTC1", # enable stack checks
-    "/GS", # enable security checks
-    "/Gy", # separate functions for linker
-    "/Zc:wchar_t",
-    "/Gd",
-    "/MD" if GetOption("dynamic-crt") else "/MT",
-])
-
-var.Add('LINKFLAGS', 'Linker Flags', [
-    "/DEBUG", # Generate debug symbols
-    "/INCREMENTAL:NO", # Disable incremental linking
-    "/OPT:REF", # Remove dead code
-    "/DYNAMICBASE",
-    "/NXCOMPAT",
 ])
 
 var.Add('TOOLS', 'SCons tools', [
@@ -190,6 +156,14 @@ if GetOption("verbose"):
     env.Append(CPPDEFINES = ["HAVE_VERBOSE"])
 
 
+
+# Inject our ninja hack before we process all the SConscript files
+if GetOption('ninja'):
+    import scons_to_ninja
+    scons_to_ninja.GenerateNinjaFile(
+        env, dest_file='build.ninja')
+    print "Using Ninja mode"
+
 # Build WiredTiger.h file
 #
 version_file = 'build_posix/aclocal/version-set.m4'
@@ -246,7 +220,7 @@ wtheader = env.Substfile(
 #
 condition_map = {
     'ARM64_HOST' : False,
-    'POSIX_HOST' : env['PLATFORM'] == 'posix',
+    'POSIX_HOST' : True, #env['PLATFORM'] == 'posix',
     'POWERPC_HOST' : False,
     'WINDOWS_HOST' : env['PLATFORM'] == 'win32',
     'X86_HOST' : True,
@@ -287,7 +261,7 @@ env.Depends(wtlib, [filelistfile, version_file])
 #
 wtdll = env.SharedLibrary(
     target="wiredtiger",
-    source=wt_objs + ['build_win/wiredtiger.def'], LIBS=wtlibs)
+    source=wt_objs, LIBS=wtlibs)
 
 env.Depends(wtdll, [filelistfile, version_file])
 
@@ -354,8 +328,8 @@ if GetOption("lang-python"):
     Default(swiginstall, copySwig)
 
 # Shim library of functions to emulate POSIX on Windows
-shim = env.Library("window_shim",
-        ["test/windows/windows_shim.c"])
+#shim = env.Library("window_shim",
+        #["test/windows/windows_shim.c"])
 
 
 
@@ -443,7 +417,7 @@ t = env.Program("t_fops",
     ["test/fops/file.c",
     "test/fops/fops.c",
     "test/fops/t.c"],
-    LIBS=[wtlib, shim, testutil] + wtlibs)
+    LIBS=[wtlib, testutil] + wtlibs)
 env.Append(CPPPATH=["test/utility"])
 Default(t)
 
@@ -459,7 +433,7 @@ t = env.Program("t_format",
     "test/format/t.c",
     "test/format/util.c",
     "test/format/wts.c"],
-     LIBS=[wtlib, shim, testutil] + wtlibs)
+     LIBS=[wtlib, testutil] + wtlibs)
 Default(t)
 
 #env.Program("t_thread",
@@ -482,20 +456,20 @@ t = env.Program("wtperf", [
     "bench/wtperf/wtperf_throttle.c",
     "bench/wtperf/wtperf_truncate.c",
     ],
-    LIBS=[wtlib, shim, testutil] + wtlibs)
+    LIBS=[wtlib, testutil] + wtlibs)
 Default(t)
 
 #Build the Examples
-for ex in examples:
-    if(ex in ['ex_all', 'ex_async', 'ex_encrypt', 'ex_file_system' , 'ex_thread']):
-        exp = env.Program(ex, "examples/c/" + ex + ".c", LIBS=[wtlib, shim] + wtlibs)
-        Default(exp)
-        env.Alias("check", env.SmokeTest(exp))
-    else:
-        exp = env.Program(ex, "examples/c/" + ex + ".c", LIBS=[wtdll[1]] + wtlibs)
-        Default(exp)
-        if not ex == 'ex_log':
-            env.Alias("check", env.SmokeTest(exp))
+#for ex in examples:
+    #if(ex in ['ex_all', 'ex_async', 'ex_encrypt', 'ex_file_system' , 'ex_thread']):
+        #exp = env.Program(ex, "examples/c/" + ex + ".c", LIBS=[wtlib, shim] + wtlibs)
+        #Default(exp)
+        #env.Alias("check", env.SmokeTest(exp))
+    #else:
+        #exp = env.Program(ex, "examples/c/" + ex + ".c", LIBS=[wtdll[0]] + wtlibs)
+        #Default(exp)
+        #if not ex == 'ex_log':
+            #env.Alias("check", env.SmokeTest(exp))
 
 # Install Target
 #
@@ -503,5 +477,4 @@ prefix = GetOption("prefix")
 env.Alias("install", env.Install(os.path.join(prefix, "bin"), wtbin))
 env.Alias("install", env.Install(os.path.join(prefix, "bin"), wtdll[0])) # Just the dll
 env.Alias("install", env.Install(os.path.join(prefix, "include"), wtheader))
-env.Alias("install", env.Install(os.path.join(prefix, "lib"), wtdll[1])) # Just the import lib
 env.Alias("install", env.Install(os.path.join(prefix, "lib"), wtlib))
