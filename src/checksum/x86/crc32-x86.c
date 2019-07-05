@@ -27,6 +27,7 @@
  */
 
 #include <wiredtiger_config.h>
+#include <intrin.h>
 #include <inttypes.h>
 #include <stddef.h>
 
